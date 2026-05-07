@@ -39,7 +39,7 @@ div[data-testid="stButton"] button:hover { opacity: 0.85 !important; }
 
 # ── Análise via Inference API do HuggingFace (sem torch, sem GPU) ─────────────
 def analisar_sentimento(texto, hf_token):
-    API_URL = "https://api-inference.huggingface.co/models/cardiffnlp/twitter-xlm-roberta-base-sentiment"
+    API_URL = "https://router.huggingface.co/hf-inference/models/cardiffnlp/twitter-xlm-roberta-base-sentiment"
     headers = {"Authorization": f"Bearer {hf_token}"}
     for tentativa in range(3):
         resp = requests.post(API_URL, headers=headers, json={"inputs": texto[:512]}, timeout=30)
