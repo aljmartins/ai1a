@@ -59,18 +59,12 @@ st.markdown('<div class="titulo">Analisador de<br>Sentimentos</div>', unsafe_all
 st.markdown('<div class="subtitulo">Inteligência Artificial · NLP · Transformers · PT-BR</div>', unsafe_allow_html=True)
 st.markdown('<div class="aviso-modelo">🤖 Modelo: <strong>XLM-RoBERTa</strong> multilíngue via HuggingFace API · português, inglês, espanhol e mais</div>', unsafe_allow_html=True)
 
-# ── Token HuggingFace ──────────────────────────────────────────────────────────
-with st.expander("🔑 Configurar token HuggingFace (gratuito — necessário)"):
-    st.markdown("""
-1. Acesse [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
-2. Clique em **New token** → tipo **Read** → copie
-3. Cole abaixo:
-""")
-    hf_token = st.text_input("Token HuggingFace:", type="password", placeholder="hf_...")
-    if hf_token:
-        st.session_state["hf_token"] = hf_token
-
-token_atual = st.session_state.get("hf_token", "")
+# ── Token HuggingFace via Secrets (não aparece para o usuário) ────────────────
+try:
+    token_atual = st.secrets["HF_TOKEN"]
+except Exception:
+    token_atual = ""
+    st.error("⚠️ Token não configurado. Adicione HF_TOKEN nos Secrets do Streamlit Cloud.")
 
 # ── Exemplos ───────────────────────────────────────────────────────────────────
 exemplos = [
@@ -107,7 +101,7 @@ if analisar:
     if not texto_limpo:
         st.warning("Digite algum texto antes de analisar.")
     elif not token_atual:
-        st.error("⚠️ Insira o token HuggingFace no painel acima. É gratuito e leva 1 minuto!")
+        st.error("⚠️ Token não configurado nos Secrets do Streamlit Cloud.")
     else:
         with st.spinner("Analisando..."):
             resultados = analisar_sentimento(texto_limpo, token_atual)
