@@ -64,7 +64,11 @@ try:
     token_atual = st.secrets["HF_TOKEN"]
 except Exception:
     token_atual = ""
-    st.error("⚠️ Token não configurado. Adicione HF_TOKEN nos Secrets do Streamlit Cloud.")
+    st.error("⚠️ Token não configurado.")
+
+# DEBUG TEMPORÁRIO — remova depois
+st.write("Token carregado:", "✅ sim" if token_atual else "❌ não")
+st.write("Primeiros chars:", token_atual[:6] if token_atual else "vazio")
 
 # ── Exemplos ───────────────────────────────────────────────────────────────────
 exemplos = [
