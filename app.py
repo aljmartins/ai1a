@@ -43,10 +43,11 @@ def analisar_sentimento(texto, hf_token):
     headers = {"Authorization": f"Bearer {hf_token}"}
     for tentativa in range(3):
         resp = requests.post(API_URL, headers=headers, json={"inputs": texto[:512]}, timeout=30)
-        # DEBUG — mostra resposta crua da API
-        st.code(f"Status: {resp.status_code}\nResposta: {resp.text[:500]}", language="json")
+
         if resp.status_code == 200:
-            return resp.json()[0]
+            data = resp.json()
+            # API retorna [[{...}]] — pega o primeiro elemento do array externo
+            return data[0] if isinstance(data[0], list) else data
         elif resp.status_code == 503:
             espera = resp.json().get("estimated_time", 15)
             st.info(f"⏳ Modelo iniciando no servidor HuggingFace... aguarde {int(espera)}s")
@@ -109,17 +110,18 @@ if analisar:
             resultados = analisar_sentimento(texto_limpo, token_atual)
 
         if resultados:
-            scores = {r["label"]: r["score"] for r in resultados}
-            pos = scores.get("Positive", 0)
-            neg = scores.get("Negative", 0)
-            neu = scores.get("Neutral", 0)
+            # normaliza labels para minúsculo
+            scores = {r["label"].lower(): r["score"] for r in resultados}
+            pos = scores.get("positive", 0)
+            neg = scores.get("negative", 0)
+            neu = scores.get("neutral", 0)
             melhor = max(scores, key=scores.get)
             pct = int(scores[melhor] * 100)
 
-            if melhor == "Positive":
+            if melhor == "positive":
                 sentimento, emoji = "Positivo", "😊"
                 classe_card, classe_label, classe_barra = "card-positivo", "label-positivo", "barra-fill-pos"
-            elif melhor == "Negative":
+            elif melhor == "negative":
                 sentimento, emoji = "Negativo", "😞"
                 classe_card, classe_label, classe_barra = "card-negativo", "label-negativo", "barra-fill-neg"
             else:
