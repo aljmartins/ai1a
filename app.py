@@ -43,6 +43,8 @@ def analisar_sentimento(texto, hf_token):
     headers = {"Authorization": f"Bearer {hf_token}"}
     for tentativa in range(3):
         resp = requests.post(API_URL, headers=headers, json={"inputs": texto[:512]}, timeout=30)
+        # DEBUG — mostra resposta crua da API
+        st.code(f"Status: {resp.status_code}\nResposta: {resp.text[:500]}", language="json")
         if resp.status_code == 200:
             return resp.json()[0]
         elif resp.status_code == 503:
@@ -64,11 +66,7 @@ try:
     token_atual = st.secrets["HF_TOKEN"]
 except Exception:
     token_atual = ""
-    st.error("⚠️ Token não configurado.")
-
-# DEBUG TEMPORÁRIO — remova depois
-st.write("Token carregado:", "✅ sim" if token_atual else "❌ não")
-st.write("Primeiros chars:", token_atual[:6] if token_atual else "vazio")
+    st.error("⚠️ Token não configurado. Adicione HF_TOKEN nos Secrets do Streamlit Cloud.")
 
 # ── Exemplos ───────────────────────────────────────────────────────────────────
 exemplos = [
